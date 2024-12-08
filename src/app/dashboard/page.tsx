@@ -1,3 +1,12 @@
+import { SignedIn, UserButton } from "@clerk/nextjs";
+
 export default function DashboardPage() {
-  return <div>Dashboard Page (Protected)</div>;
+  return (
+    <div>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+      Dashboard Page (Protected)
+    </div>
+  );
 }
