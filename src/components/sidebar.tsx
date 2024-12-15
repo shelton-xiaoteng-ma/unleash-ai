@@ -68,7 +68,7 @@ const routes = [
 export const Sidebar = () => {
   const pathname = usePathname();
 
-  const disableLink = (e: React.MouseEvent, disabled) => {
+  const disableLink = (e: React.MouseEvent, disabled: boolean) => {
     if (disabled) {
       e.preventDefault();
     }
