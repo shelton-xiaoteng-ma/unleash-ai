@@ -9,9 +9,9 @@ import {
   useSendMessage,
 } from "@/features/conversation/api/use-send-message";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MessageSquare } from "lucide-react";
+import { Loader, MessageSquare } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import ReactMarkdown from "react-markdown";
 import * as z from "zod";
@@ -21,7 +21,8 @@ export default function ConversationPage() {
   const [messages, setMessages] = useState<sendMessageResponseType["messages"]>(
     []
   );
-  const mutation = useSendMessage();
+  const { mutate, isPending } = useSendMessage();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -31,19 +32,30 @@ export default function ConversationPage() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    mutation.mutate(
+    messages.push({
+      role: "user",
+      content: values["prompt"],
+    });
+    setMessages(messages);
+    mutate(
       { message: values["prompt"] },
       {
-        onSuccess: (data) => {
+        onSuccess: (data: sendMessageResponseType) => {
           setMessages(data.messages);
           form.reset();
         },
-        onError: (error) => {
+        onError: (error: Error) => {
           console.log(error.message);
         },
       }
     );
   };
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-80px)]">
@@ -55,55 +67,72 @@ export default function ConversationPage() {
         bgColor="bg-pink-700/10"
       />
       <div className="px-4 lg:px-8 flex flex-col flex-1 overflow-hidden">
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto" ref={scrollRef}>
           <div className="relative min-h-full">
-            <div className="absolute inset-0 bg-[url('/logo.png')] bg-no-repeat bg-center bg-[length:60%] opacity-20"></div>
-            <div className="relative z-10 space-y-4 p-4">
-              {messages.map(
-                (
-                  message: sendMessageResponseType["messages"][number],
-                  index: number
-                ) => (
-                  <div
-                    key={index}
-                    className={`flex ${
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
+            <div className="absolute inset-0 bg-[url('/logo.png')] bg-no-repeat bg-center bg-[length:40%] opacity-20"></div>
+            {isPending && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <Loader className="text-muted-foreground size-20 animate-spin" />
+                <p className="text-muted-foreground text-xl">Thinking...</p>
+              </div>
+            )}
+            {!isPending && messages.length === 0 && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <p className="text-muted-foreground text-lg">
+                  Start your conversation
+                </p>
+              </div>
+            )}
+            {messages.length !== 0 && (
+              <div className="relative z-10 space-y-4 p-4">
+                {messages.map(
+                  (
+                    message: sendMessageResponseType["messages"][number],
+                    index: number
+                  ) => (
                     <div
-                      className={`rounded-lg p-4 max-w-[80%] ${
+                      key={index}
+                      className={`flex ${
                         message.role === "user"
-                          ? "bg-pink-700 text-white"
-                          : "bg-gray-200 text-gray-900"
+                          ? "justify-end"
+                          : "justify-start"
                       }`}
                     >
-                      <ReactMarkdown
-                        className={`prose ${
+                      <div
+                        className={`rounded-lg p-4 max-w-[80%] ${
                           message.role === "user"
-                            ? "prose-invert"
-                            : "prose-gray"
-                        } max-w-none`}
-                        components={{
-                          pre: ({ ...props }) => (
-                            <div className="overflow-auto w-full my-2 rounded-lg bg-gray-800 p-2">
-                              <pre {...props} />
-                            </div>
-                          ),
-                          code: ({ ...props }) => (
-                            <code
-                              className="bg-gray-800 rounded-lg p-1"
-                              {...props}
-                            />
-                          ),
-                        }}
+                            ? "bg-pink-700 text-white"
+                            : "bg-gray-200 text-gray-900"
+                        }`}
                       >
-                        {message.content}
-                      </ReactMarkdown>
+                        <ReactMarkdown
+                          className={`prose ${
+                            message.role === "user"
+                              ? "prose-invert"
+                              : "prose-gray"
+                          } max-w-none`}
+                          components={{
+                            pre: ({ ...props }) => (
+                              <div className="overflow-auto w-full my-2 rounded-lg bg-gray-800 p-2">
+                                <pre {...props} />
+                              </div>
+                            ),
+                            code: ({ ...props }) => (
+                              <code
+                                className="bg-gray-800 rounded-lg p-1"
+                                {...props}
+                              />
+                            ),
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
                     </div>
-                  </div>
-                )
-              )}
-            </div>
+                  )
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -125,7 +154,7 @@ export default function ConversationPage() {
                   <FormItem className="col-span-12 lg:col-span-10">
                     <FormControl className="m-0 p-0">
                       <Input
-                        disabled={mutation.isPending}
+                        disabled={isPending}
                         placeholder="Send message to AI"
                         {...field}
                         className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
@@ -135,7 +164,7 @@ export default function ConversationPage() {
                 )}
               />
               <Button
-                disabled={mutation.isPending}
+                disabled={isPending}
                 variant="ghost"
                 size="icon"
                 className="rounded-full relative hover:bg-pink-700/20 col-span-12 ml-auto lg:col-span-2"

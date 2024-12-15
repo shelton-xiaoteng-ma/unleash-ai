@@ -2,11 +2,11 @@
 
 import { cn } from "@/lib/utils";
 import {
-  Code,
   ImageIcon,
   LayoutDashboard,
   MessageSquare,
   Settings,
+  VideoIcon,
 } from "lucide-react";
 import { Montserrat } from "next/font/google";
 import Image from "next/image";
@@ -21,36 +21,41 @@ const routes = [
     icon: LayoutDashboard,
     href: "/dashboard",
     color: "text-green-300",
+    disable: false,
   },
   {
     label: "Conversation",
     icon: MessageSquare,
     href: "/conversation",
     color: "text-pink-700",
+    disable: false,
   },
-  {
-    label: "Code Generation",
-    icon: Code,
-    href: "/code",
-    color: "text-yellow-500",
-  },
+  // {
+  //   label: "Code Generation",
+  //   icon: Code,
+  //   href: "/code",
+  //   color: "text-yellow-500",
+  // },
   {
     label: "Image Generation",
     icon: ImageIcon,
     href: "/image",
     color: "text-purple-600",
+    disable: true,
   },
-  // {
-  //   label: "Video Generation",
-  //   icon: VideoIcon,
-  //   href: "/video",
-  //   color: "text-orange-700",
-  // },
+  {
+    label: "Video Generation",
+    icon: VideoIcon,
+    href: "/video",
+    color: "text-orange-700",
+    disable: true,
+  },
   {
     label: "Settings",
     icon: Settings,
     href: "/settings",
     color: "text-black",
+    disable: true,
   },
   // {
   //   label: "Music Generation",
@@ -62,6 +67,12 @@ const routes = [
 
 export const Sidebar = () => {
   const pathname = usePathname();
+
+  const disableLink = (e: React.MouseEvent, disabled) => {
+    if (disabled) {
+      e.preventDefault();
+    }
+  };
 
   return (
     <div className="h-full flex flex-col space-y-4 py-4 bg-blue-700 text-white">
@@ -78,22 +89,31 @@ export const Sidebar = () => {
         <div className="space-y-1">
           {routes.map((route) => (
             <Link
+              onClick={(e) => {
+                disableLink(e, route.disable);
+              }}
               href={route.href}
               key={route.href}
               className={cn(
                 "text-lg font-medium cursor-pointer p-5 w-full rounded-lg flex items-center flex-1 group hover:text-white hover:bg-white/10 transition",
                 pathname === route.href
                   ? "bg-white/10 text-white"
-                  : "text-gray-100"
+                  : "text-gray-100",
+                route.disable && "text-muted-foreground"
               )}
             >
               <route.icon
                 className={cn(
                   "h-6 w-6 mr-3 group-hover:text-white",
-                  route.color
+                  route.disable ? "text-muted-foreground" : route.color
                 )}
               />
-              {route.label}
+              <div>
+                {route.label}
+                {route.disable && (
+                  <p className="text-muted-foreground text-sm">Coming soon</p>
+                )}
+              </div>
             </Link>
           ))}
         </div>
