@@ -17,7 +17,11 @@ import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { amountOptions, formSchema, resolutionOptions } from "./constants";
+import {
+  expectRatioOptions,
+  formSchema,
+  outputFormatOptions,
+} from "./constants";
 
 export default function ImagePage() {
   const [images, setImages] = useState<string[]>([]);
@@ -26,8 +30,8 @@ export default function ImagePage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       prompt: "",
-      amount: "1",
-      resolution: "256*256",
+      ratio: "3:2",
+      outputType: "webp",
     },
   });
 
@@ -94,7 +98,7 @@ export default function ImagePage() {
                 )}
               />
               <FormField
-                name="amount"
+                name="ratio"
                 render={({ field }) => (
                   <FormItem className="col-span-12 lg:col-span-2">
                     <Select
@@ -104,15 +108,15 @@ export default function ImagePage() {
                       defaultValue={field.value}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Choice amount" />
+                        <SelectValue placeholder="Expect Ratio" />
                       </SelectTrigger>
                       <SelectContent>
-                        {amountOptions.map((amountOption) => (
+                        {expectRatioOptions.map((expectRatio) => (
                           <SelectItem
-                            value={amountOption.value}
-                            key={amountOption.value}
+                            value={expectRatio.value}
+                            key={expectRatio.value}
                           >
-                            {amountOption.label}
+                            {expectRatio.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -121,7 +125,7 @@ export default function ImagePage() {
                 )}
               />
               <FormField
-                name="resolution"
+                name="outputType"
                 render={({ field }) => (
                   <FormItem className="col-span-12 lg:col-span-2">
                     <Select
@@ -131,15 +135,15 @@ export default function ImagePage() {
                       defaultValue={field.value}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Choice resolution" />
+                        <SelectValue placeholder="Choice output format type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {resolutionOptions.map((resolutionOption) => (
+                        {outputFormatOptions.map((outputFormat) => (
                           <SelectItem
-                            value={resolutionOption.value}
-                            key={resolutionOption.value}
+                            value={outputFormat.value}
+                            key={outputFormat.value}
                           >
-                            {resolutionOption.label}
+                            {outputFormat.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
