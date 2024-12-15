@@ -41,7 +41,7 @@ const routes = [
     icon: ImageIcon,
     href: "/image",
     color: "text-purple-600",
-    disable: true,
+    disable: false,
   },
   {
     label: "Video Generation",

@@ -27,7 +27,7 @@ const tools = [
     href: "/image",
     color: "text-purple-600",
     bgColor: "bg-purple-600/10",
-    disable: true,
+    disable: false,
   },
   {
     label: "Video Generation",
