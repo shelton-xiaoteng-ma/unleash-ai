@@ -14,34 +14,77 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageIcon, Loader } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import {
-  expectRatioOptions,
+  aspectRatioOptions,
   formSchema,
   outputFormatOptions,
 } from "./constants";
 
-export default function ImagePage() {
-  const [images, setImages] = useState<string[]>([]);
+import {
+  ResponseType,
+  useImageCreatePrediction,
+} from "@/features/image/api/use-image-create-prediction";
+import { useImageGetPrediction } from "@/features/image/api/use-image-get-prediction";
+import { replicatePendingStatus } from "@/lib/replicate";
+import { toast } from "sonner";
 
+export default function ImagePage() {
+  const [image, setImage] = useState<string | null>(null);
+  const predictionIdRef = useRef<string | null>(null);
+  const { mutate, isPending: isPendingCreatePrediction } =
+    useImageCreatePrediction();
+
+  const { data: imageData, isLoading: isLoadingImage } = useImageGetPrediction(
+    predictionIdRef.current
+  );
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       prompt: "",
-      ratio: "3:2",
-      outputType: "webp",
+      aspectRatio: "3:2",
+      outputFormat: "webp",
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setImages([]);
-    console.log(values);
-    form.reset();
-  };
+  const resetRef = useRef(form.reset);
 
-  const isPending = false;
+  const isLoading = useMemo(() => {
+    return (
+      isLoadingImage ||
+      isPendingCreatePrediction ||
+      (imageData?.prediction_status &&
+        replicatePendingStatus.includes(imageData?.prediction_status))
+    );
+  }, [isLoadingImage, isPendingCreatePrediction, imageData]);
+
+  useEffect(() => {
+    if (imageData?.imageUrl) {
+      setImage(imageData.imageUrl);
+      resetRef.current({});
+    }
+  }, [imageData]);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setImage(null);
+    mutate(
+      {
+        prompt: values["prompt"],
+        aspectRatio: values["aspectRatio"],
+        outputFormat: values["outputFormat"],
+      },
+      {
+        onSuccess: (data: ResponseType) => {
+          predictionIdRef.current = data.prediction.id;
+        },
+        onError: () => {
+          toast.error("Generate Image went wrong.");
+        },
+      }
+    );
+  };
 
   return (
     <div className="flex flex-col h-[calc(100vh-80px)]">
@@ -54,20 +97,42 @@ export default function ImagePage() {
       />
       <div className="px-4 lg:px-8 flex flex-col flex-1">
         <div className="flex flex-col flex-1">
-          {isPending && (
+          {isLoading && (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <Loader className="text-muted-foreground size-20 animate-spin" />
+              {imageData?.prediction_status && (
+                <p className="text-xl">
+                  Prediction current state: {imageData?.prediction_status}.
+                </p>
+              )}
               <p className="text-muted-foreground text-xl">
-                Images generating...
+                Image generating...
               </p>
             </div>
           )}
-          {!isPending && images.length === 0 && (
-            <div className="flex-1 flex items-center justify-center">
-              No images generated
+          {!isLoading && !image && (
+            <div className="flex-1 flex flex-col items-center justify-center gap-2">
+              No image generated
+              {imageData?.prediction_status && (
+                <p className="text-muted-foreground">
+                  The current prediction has been
+                  <span className="pl-2 text-blue-300 underline">
+                    {imageData?.prediction_status}
+                  </span>
+                </p>
+              )}
             </div>
           )}
-          {images.length !== 0 && <div>Images will be rendered here</div>}
+          {image && (
+            <div className="relative h-full p-4">
+              <Image
+                fill
+                src={image}
+                alt="New Image"
+                className="object-contain"
+              />
+            </div>
+          )}
         </div>
 
         <div className="py-4">
@@ -84,13 +149,14 @@ export default function ImagePage() {
             >
               <FormField
                 name="prompt"
-                render={({ field }) => (
+                render={({ field: { onChange, value } }) => (
                   <FormItem className="col-span-12 lg:col-span-7">
                     <FormControl className="m-0 p-0">
                       <Input
-                        disabled={isPending}
+                        disabled={isLoading}
                         placeholder="A cute puppy"
-                        {...field}
+                        value={value}
+                        onChange={onChange}
                         className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                       />
                     </FormControl>
@@ -98,25 +164,25 @@ export default function ImagePage() {
                 )}
               />
               <FormField
-                name="ratio"
+                name="aspectRatio"
                 render={({ field }) => (
                   <FormItem className="col-span-12 lg:col-span-2">
                     <Select
-                      disabled={isPending}
+                      disabled={isLoading}
                       onValueChange={field.onChange}
                       value={field.value}
                       defaultValue={field.value}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Expect Ratio" />
+                        <SelectValue placeholder="Aspect Ratio" />
                       </SelectTrigger>
                       <SelectContent>
-                        {expectRatioOptions.map((expectRatio) => (
+                        {aspectRatioOptions.map((aspectRatio) => (
                           <SelectItem
-                            value={expectRatio.value}
-                            key={expectRatio.value}
+                            value={aspectRatio.value}
+                            key={aspectRatio.value}
                           >
-                            {expectRatio.label}
+                            {aspectRatio.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -125,11 +191,11 @@ export default function ImagePage() {
                 )}
               />
               <FormField
-                name="outputType"
+                name="outputFormat"
                 render={({ field }) => (
                   <FormItem className="col-span-12 lg:col-span-2">
                     <Select
-                      disabled={isPending}
+                      disabled={isLoading}
                       onValueChange={field.onChange}
                       value={field.value}
                       defaultValue={field.value}
@@ -152,7 +218,7 @@ export default function ImagePage() {
                 )}
               />
               <Button
-                disabled={isPending}
+                disabled={isLoading}
                 variant="ghost"
                 size="icon"
                 className="rounded-full relative hover:bg-pink-700/20 col-span-12 ml-auto lg:col-span-1"

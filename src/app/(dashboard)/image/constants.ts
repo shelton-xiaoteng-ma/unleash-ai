@@ -2,8 +2,8 @@ import * as z from "zod";
 
 export const formSchema = z.object({
   prompt: z.string().min(1, { message: "Image prompt is required." }),
-  ratio: z.string().min(1),
-  outputType: z.string().min(1),
+  aspectRatio: z.string().min(1),
+  outputFormat: z.string().min(1),
 });
 
 export const amountOptions = [
@@ -29,7 +29,7 @@ export const resolutionOptions = [
   },
 ];
 
-export const expectRatioOptions = [
+export const aspectRatioOptions = [
   {
     value: "16:9",
     label: "16:9",

@@ -2,6 +2,7 @@ import { clerkMiddleware } from "@hono/clerk-auth";
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
 import conversation from "./conversation";
+import image from "./image";
 
 // Set "edge" if planning on planning with edge on Vercel
 // export const runtime = "nodejs";
@@ -18,7 +19,7 @@ app.use(
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const routes = app.route("/conversation", conversation);
+const routes = app.route("/conversation", conversation).route("/image", image);
 
 export const GET = handle(app);
 export const POST = handle(app);
