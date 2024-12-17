@@ -5,8 +5,8 @@ import { FaGithub } from "react-icons/fa";
 
 export const LandingFooter = () => {
   return (
-    <div className="mt-32 md:mt-20">
-      <h2 className="text-center text-2xl font-semibold mb-4">More</h2>
+    <div className="mt-4">
+      <h2 className="text-center text-2xl font-semibold mb-2">More</h2>
       <div className="flex flex-col items-center justify-center py-4 px-8 md:px-16 gap-2">
         <Link
           href="https://github.com/shelton-xiaoteng-ma/unleash-ai"
