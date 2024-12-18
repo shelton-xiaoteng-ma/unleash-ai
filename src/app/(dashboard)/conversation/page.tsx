@@ -113,13 +113,13 @@ export default function ConversationPage() {
                           } max-w-none`}
                           components={{
                             pre: ({ ...props }) => (
-                              <div className="overflow-auto w-full my-2 rounded-lg bg-gray-800 p-2">
+                              <div className="overflow-auto w-full my-2 rounded-lg bg-gray-300 p-2">
                                 <pre {...props} />
                               </div>
                             ),
                             code: ({ ...props }) => (
                               <code
-                                className="bg-gray-800 rounded-lg p-1"
+                                className="bg-gray-300 rounded-lg p-1"
                                 {...props}
                               />
                             ),
