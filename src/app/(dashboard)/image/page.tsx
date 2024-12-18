@@ -29,9 +29,11 @@ import {
 } from "@/features/image/api/use-image-create-prediction";
 import { useImageGetPrediction } from "@/features/image/api/use-image-get-prediction";
 import { replicatePendingStatus } from "@/lib/replicate";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export default function ImagePage() {
+  const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
   const predictionIdRef = useRef<string | null>(null);
   const { mutate, isPending: isPendingCreatePrediction } =
@@ -78,6 +80,7 @@ export default function ImagePage() {
       {
         onSuccess: (data: ResponseType) => {
           predictionIdRef.current = data.prediction.id;
+          router.refresh();
         },
         onError: () => {
           toast.error("Generate Image went wrong.");

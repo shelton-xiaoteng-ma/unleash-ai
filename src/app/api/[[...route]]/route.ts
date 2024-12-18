@@ -5,8 +5,8 @@ import conversation from "./conversation";
 import image from "./image";
 
 // Set "edge" if planning on planning with edge on Vercel
-// export const runtime = "nodejs";
-export const runtime = "edge";
+export const runtime = "nodejs";
+// export const runtime = "edge";
 
 const app = new Hono().basePath("/api");
 

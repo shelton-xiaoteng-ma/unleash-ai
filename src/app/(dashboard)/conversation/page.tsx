@@ -11,6 +11,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader, MessageSquare } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import ReactMarkdown from "react-markdown";
@@ -18,6 +19,7 @@ import * as z from "zod";
 import { formSchema } from "./constants";
 
 export default function ConversationPage() {
+  const router = useRouter();
   const [messages, setMessages] = useState<sendMessageResponseType["messages"]>(
     []
   );
@@ -43,6 +45,7 @@ export default function ConversationPage() {
         onSuccess: (data: sendMessageResponseType) => {
           setMessages(data.messages);
           form.reset();
+          router.refresh();
         },
         onError: (error: Error) => {
           console.log(error.message);

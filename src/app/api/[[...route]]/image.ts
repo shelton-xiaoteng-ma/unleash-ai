@@ -1,3 +1,4 @@
+import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
 import { replicate } from "@/lib/replicate";
 import { getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
@@ -32,6 +33,12 @@ const app = new Hono()
         );
       }
 
+      const freeTrial = await checkApiLimit();
+
+      if (!freeTrial) {
+        return c.json({ message: "" }, 403);
+      }
+
       const { prompt, aspectRatio, outputFormat, modelName } =
         c.req.valid("json");
 
@@ -45,6 +52,8 @@ const app = new Hono()
           },
         };
         const prediction = await replicate.predictions.create(options);
+
+        await increaseApiLimit();
 
         if (prediction?.error) {
           return c.json({ detail: prediction.error }, 500);

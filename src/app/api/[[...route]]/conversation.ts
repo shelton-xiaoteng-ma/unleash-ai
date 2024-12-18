@@ -1,3 +1,4 @@
+import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
 import { getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
@@ -30,6 +31,12 @@ const app = new Hono().post(
       );
     }
 
+    const freeTrial = await checkApiLimit();
+
+    if (!freeTrial) {
+      return c.json({ message: "" }, 403);
+    }
+
     const { message, model } = c.req.valid("json");
 
     // Initialize message store for user if it doesn't exist
@@ -59,6 +66,8 @@ const app = new Hono().post(
         }),
       }
     );
+
+    await increaseApiLimit();
 
     const aiResponse = await response.json();
 

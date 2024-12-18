@@ -1,5 +1,6 @@
 "use client";
 
+import { FreeCounter } from "@/components/free-counter";
 import { cn } from "@/lib/utils";
 import {
   ImageIcon,
@@ -65,7 +66,11 @@ const routes = [
   // },
 ];
 
-export const Sidebar = () => {
+interface SidebarProps {
+  apiLimitCount: number;
+}
+
+export const Sidebar = ({ apiLimitCount }: SidebarProps) => {
   const pathname = usePathname();
 
   const disableLink = (e: React.MouseEvent, disabled: boolean) => {
@@ -118,6 +123,7 @@ export const Sidebar = () => {
           ))}
         </div>
       </div>
+      <FreeCounter apiLimitCount={apiLimitCount} />
     </div>
   );
 };
