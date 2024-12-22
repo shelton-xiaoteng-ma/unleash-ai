@@ -11,7 +11,7 @@ export default async function DashboardLayout({
   const apiLimitCount = await getApiLimitCount();
   return (
     <div className="h-full relative">
-      <div className="hidden h-full md:w-64 md:flex md:flex-col md:fixed md:inset-y-0 z-[80] bg-blue-500">
+      <div className="hidden h-full md:w-64 md:flex md:flex-col md:fixed md:inset-y-0 bg-blue-500">
         <Sidebar apiLimitCount={apiLimitCount} />
       </div>
       <main className="md:pl-64">

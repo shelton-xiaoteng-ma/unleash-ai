@@ -1,3 +1,4 @@
+import { ModalProvider } from "@/components/modal-provider";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -34,6 +35,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Toaster />
+          <ModalProvider />
           <Providers>{children}</Providers>
           <Analytics />
         </body>

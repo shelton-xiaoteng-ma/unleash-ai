@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { ArrowRight, ImageIcon, MessageSquare, VideoIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const tools = [
+export const tools = [
   {
     label: "Conversation",
     icon: MessageSquare,
