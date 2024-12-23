@@ -36,7 +36,7 @@ const app = new Hono()
       const freeTrial = await checkApiLimit();
 
       if (!freeTrial) {
-        return c.json({ message: "" }, 403);
+        return c.json({ message: "Free Trial has expired" }, 403);
       }
 
       const { prompt, aspectRatio, outputFormat, modelName } =

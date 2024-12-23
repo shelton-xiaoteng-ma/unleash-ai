@@ -1,7 +1,7 @@
+import { APIError } from "@/lib/errors";
 import { client } from "@/lib/hono";
 import { useMutation } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
-import { toast } from "sonner";
 
 export type ResponseType = InferResponseType<
   typeof client.api.conversation.$post,
@@ -17,12 +17,9 @@ export const useSendMessage = () => {
     mutationFn: async (json) => {
       const response = await client.api.conversation.$post({ json });
       if (!response.ok) {
-        throw new Error("Something went wrong");
+        throw new APIError("Something went wrong", response);
       }
       return await response.json();
-    },
-    onError: () => {
-      toast.error("Failed to send message");
     },
   });
   return mutation;

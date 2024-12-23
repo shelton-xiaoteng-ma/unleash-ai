@@ -34,7 +34,7 @@ const app = new Hono().post(
     const freeTrial = await checkApiLimit();
 
     if (!freeTrial) {
-      return c.json({ message: "" }, 403);
+      return c.json({ message: "Free trial has expired" }, 403);
     }
 
     const { message, model } = c.req.valid("json");

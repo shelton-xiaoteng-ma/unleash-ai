@@ -28,12 +28,15 @@ import {
   useImageCreatePrediction,
 } from "@/features/image/api/use-image-create-prediction";
 import { useImageGetPrediction } from "@/features/image/api/use-image-get-prediction";
+import { useProModal } from "@/features/saas/store/use-pro-modal";
+import { APIError } from "@/lib/errors";
 import { replicatePendingStatus } from "@/lib/replicate";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export default function ImagePage() {
   const router = useRouter();
+  const { open } = useProModal();
   const [image, setImage] = useState<string | null>(null);
   const predictionIdRef = useRef<string | null>(null);
   const { mutate, isPending: isPendingCreatePrediction } =
@@ -82,8 +85,14 @@ export default function ImagePage() {
           predictionIdRef.current = data.prediction.id;
           router.refresh();
         },
-        onError: () => {
-          toast.error("Generate Image went wrong.");
+        onError: (error: Error | APIError) => {
+          if (error instanceof APIError && error?.response.status === 403) {
+            toast.error("Free trial has expired");
+            // Open ProModal
+            open();
+          } else {
+            toast.error("Create prediction failed");
+          }
         },
       }
     );

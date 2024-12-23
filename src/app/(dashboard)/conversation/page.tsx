@@ -8,6 +8,8 @@ import {
   ResponseType as sendMessageResponseType,
   useSendMessage,
 } from "@/features/conversation/api/use-send-message";
+import { useProModal } from "@/features/saas/store/use-pro-modal";
+import { APIError } from "@/lib/errors";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader, MessageSquare } from "lucide-react";
 import Image from "next/image";
@@ -15,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 import * as z from "zod";
 import { formSchema } from "./constants";
 
@@ -25,6 +28,7 @@ export default function ConversationPage() {
   );
   const { mutate, isPending } = useSendMessage();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { open } = useProModal();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,8 +51,14 @@ export default function ConversationPage() {
           form.reset();
           router.refresh();
         },
-        onError: (error: Error) => {
-          console.log(error.message);
+        onError: (error: Error | APIError) => {
+          if (error instanceof APIError && error?.response.status === 403) {
+            toast.error("Free trial has expired");
+            // Open ProModal
+            open();
+          } else {
+            toast.error("Failed to send message.");
+          }
         },
       }
     );
