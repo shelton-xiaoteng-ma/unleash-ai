@@ -1,6 +1,6 @@
 "use client";
 
-import { tools } from "@/app/(dashboard)/dashboard/page";
+import { tools } from "@/app/(dashboard)/dashboard/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { useProModal } from "@/features/saas/store/use-pro-modal";
 import { cn } from "@/lib/utils";
