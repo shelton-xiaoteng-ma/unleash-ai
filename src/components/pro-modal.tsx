@@ -7,10 +7,9 @@ import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { useProModal } from "@/features/saas/store/use-pro-modal";
 import { cn } from "@/lib/utils";
@@ -26,23 +25,21 @@ export const ProModal = () => {
             Upgrade to Pro
             <Badge className="uppercase text-sm p-1 rounded-md">pro</Badge>
           </DialogTitle>
-          <DialogDescription className="pt-2 text-center space-y-4">
-            {tools.map((tool) => (
-              <Card
-                key={tool.label}
-                className="p-3 flex items-center justify-between border-black/5"
-              >
-                <div className="flex items-center gap-4">
-                  <div className={cn("p-2 w-fit rounded-md", tool.bgColor)}>
-                    <tool.icon className={cn("w-6 h-6", tool.color)} />
-                  </div>
-                  <div className="text-sm font-semibold">{tool.label}</div>
-                </div>
-                <Check />
-              </Card>
-            ))}
-          </DialogDescription>
         </DialogHeader>
+        {tools.map((tool) => (
+          <Card
+            key={tool.label}
+            className="p-3 flex items-center justify-between border-black/5"
+          >
+            <div className="flex items-center gap-4">
+              <div className={cn("p-2 w-fit rounded-md", tool.bgColor)}>
+                <tool.icon className={cn("w-6 h-6", tool.color)} />
+              </div>
+              <div className="text-sm font-semibold">{tool.label}</div>
+            </div>
+            <Check />
+          </Card>
+        ))}
         <DialogFooter>
           <Button variant="premium" className="w-full font-semibold">
             Upgrade <Zap />
