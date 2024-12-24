@@ -12,11 +12,28 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useProModal } from "@/features/saas/store/use-pro-modal";
+import { useCreateCheckoutSession } from "@/features/stripe/api/use-create-checkout-session";
 import { cn } from "@/lib/utils";
 import { Check, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const ProModal = () => {
   const { isOpen, close } = useProModal();
+
+  const router = useRouter();
+
+  const { data, isPending, error } = useCreateCheckoutSession();
+
+  const onSubscribe = () => {
+    if (error) {
+      toast.error("Failed to create checkout session");
+    }
+    if (!isPending && data?.url) {
+      router.push(data?.url);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={close}>
       <DialogContent className="z-50">
@@ -41,7 +58,12 @@ export const ProModal = () => {
           </Card>
         ))}
         <DialogFooter>
-          <Button variant="premium" className="w-full font-semibold">
+          <Button
+            variant="premium"
+            className="w-full font-semibold"
+            onClick={onSubscribe}
+            disabled={isPending}
+          >
             Upgrade <Zap />
           </Button>
         </DialogFooter>
