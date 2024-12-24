@@ -1,20 +1,19 @@
 import { APIError } from "@/lib/errors";
 import { client } from "@/lib/hono";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { InferResponseType } from "hono";
 
 export type ResponseType = InferResponseType<
-  (typeof client.api.stripe)["create-checkout-session"]["$get"],
+  (typeof client.api.stripe)["create-checkout-session"]["$post"],
   200
 >;
 
 export const useCreateCheckoutSession = () => {
-  const query = useQuery({
-    queryKey: ["stripe", "create-checkout-session"],
-    queryFn: async () => {
+  const mutation = useMutation({
+    mutationFn: async () => {
       const response = await client.api.stripe[
         "create-checkout-session"
-      ].$get();
+      ].$post();
       if (!response.ok) {
         throw new APIError("Failed to create checkout session", response);
       }
@@ -22,5 +21,5 @@ export const useCreateCheckoutSession = () => {
     },
   });
 
-  return query;
+  return mutation;
 };

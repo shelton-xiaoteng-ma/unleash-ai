@@ -23,15 +23,20 @@ export const ProModal = () => {
 
   const router = useRouter();
 
-  const { data, isPending, error } = useCreateCheckoutSession();
+  const { mutate: createCheckoutSession, isPending } =
+    useCreateCheckoutSession();
 
   const onSubscribe = () => {
-    if (error) {
-      toast.error("Failed to create checkout session");
-    }
-    if (!isPending && data?.url) {
-      router.push(data?.url);
-    }
+    createCheckoutSession(undefined, {
+      onSuccess: (data) => {
+        if (data.url) {
+          router.push(data.url);
+        }
+      },
+      onError: () => {
+        toast.error("Failed to create checkout session");
+      },
+    });
   };
 
   return (
