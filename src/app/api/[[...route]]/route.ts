@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { handle } from "hono/vercel";
 import conversation from "./conversation";
 import image from "./image";
+import stripe from "./stripe";
 
 // Set "edge" if planning on planning with edge on Vercel
 export const runtime = "nodejs";
@@ -19,7 +20,10 @@ app.use(
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const routes = app.route("/conversation", conversation).route("/image", image);
+const routes = app
+  .route("/conversation", conversation)
+  .route("/image", image)
+  .route("/stripe", stripe);
 
 export const GET = handle(app);
 export const POST = handle(app);
