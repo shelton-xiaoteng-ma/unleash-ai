@@ -1,6 +1,6 @@
 import { APIError } from "@/lib/errors";
 import { client } from "@/lib/hono";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 
 export type ResponseType = InferResponseType<
@@ -11,6 +11,7 @@ export type ResponseType = InferResponseType<
 type RequestType = InferRequestType<typeof client.api.image.$post>["json"];
 
 export const useImageCreatePrediction = () => {
+  const queryClient = useQueryClient();
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async (json) => {
       const response = await client.api.image.$post({ json });
@@ -18,6 +19,9 @@ export const useImageCreatePrediction = () => {
         throw new APIError("Failed to send message", response);
       }
       return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getSubscription"] });
     },
   });
   return mutation;

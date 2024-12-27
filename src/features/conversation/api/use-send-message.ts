@@ -1,6 +1,6 @@
 import { APIError } from "@/lib/errors";
 import { client } from "@/lib/hono";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 
 export type ResponseType = InferResponseType<
@@ -13,6 +13,8 @@ type RequestType = InferRequestType<
 >["json"];
 
 export const useSendMessage = () => {
+  const queryClient = useQueryClient();
+
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async (json) => {
       const response = await client.api.conversation.$post({ json });
@@ -20,6 +22,9 @@ export const useSendMessage = () => {
         throw new APIError("Something went wrong", response);
       }
       return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getSubscription"] });
     },
   });
   return mutation;
