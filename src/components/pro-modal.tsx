@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useProModal } from "@/features/saas/store/use-pro-modal";
+import { useProModal } from "@/features/subscription/store/use-pro-modal";
 import { useCreateCheckoutSession } from "@/features/stripe/api/use-create-checkout-session";
 import { cn } from "@/lib/utils";
 import { Check, Zap } from "lucide-react";

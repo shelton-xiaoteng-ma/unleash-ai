@@ -1,4 +1,5 @@
 import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
+import { checkSubscription } from "@/lib/subscription";
 import { getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
@@ -32,9 +33,10 @@ const app = new Hono().post(
     }
 
     const freeTrial = await checkApiLimit();
+    const isPro = await checkSubscription();
 
-    if (!freeTrial) {
-      return c.json({ message: "Free trial has expired" }, 403);
+    if (!freeTrial && !isPro) {
+      return c.json({ message: "Free Trial has expired" }, 403);
     }
 
     const { message, model } = c.req.valid("json");
@@ -67,7 +69,9 @@ const app = new Hono().post(
       }
     );
 
-    await increaseApiLimit();
+    if (!isPro) {
+      await increaseApiLimit();
+    }
 
     const aiResponse = await response.json();
 

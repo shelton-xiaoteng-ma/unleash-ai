@@ -3,14 +3,10 @@
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import { MobileSidebar } from "./mobile-sidebar";
 
-interface NavbarProps {
-  apiLimitCount: number;
-}
-
-export const Navbar = ({ apiLimitCount }: NavbarProps) => {
+export const Navbar = () => {
   return (
     <div className="flex items-center p-4">
-      <MobileSidebar apiLimitCount={apiLimitCount} />
+      <MobileSidebar />
       <div className="flex w-full justify-end">
         <SignedIn>
           <UserButton />

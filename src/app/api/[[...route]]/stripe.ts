@@ -31,8 +31,8 @@ const app = new Hono()
     }
     // If the user does not have a subscription, redirect them to checkout
     const stripeSession = await stripe.checkout.sessions.create({
-      success_url: absoluteUrl("/?_success"),
-      cancel_url: absoluteUrl("/?_cancel"),
+      success_url: absoluteUrl("/dashboard/?_success"),
+      cancel_url: absoluteUrl("/dashboard/?_cancel"),
       payment_method_types: ["card"],
       mode: "subscription",
       billing_address_collection: "auto",

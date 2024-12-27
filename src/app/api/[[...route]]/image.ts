@@ -1,5 +1,6 @@
 import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
 import { replicate } from "@/lib/replicate";
+import { checkSubscription } from "@/lib/subscription";
 import { getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
@@ -34,8 +35,9 @@ const app = new Hono()
       }
 
       const freeTrial = await checkApiLimit();
+      const isPro = await checkSubscription();
 
-      if (!freeTrial) {
+      if (!freeTrial && !isPro) {
         return c.json({ message: "Free Trial has expired" }, 403);
       }
 
@@ -53,7 +55,9 @@ const app = new Hono()
         };
         const prediction = await replicate.predictions.create(options);
 
-        await increaseApiLimit();
+        if (!isPro) {
+          await increaseApiLimit();
+        }
 
         if (prediction?.error) {
           return c.json({ detail: prediction.error }, 500);

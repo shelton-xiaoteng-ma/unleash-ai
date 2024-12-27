@@ -4,6 +4,7 @@ import { handle } from "hono/vercel";
 import conversation from "./conversation";
 import image from "./image";
 import stripe from "./stripe";
+import subscription from "./subscription";
 
 // Set "edge" if planning on planning with edge on Vercel
 export const runtime = "nodejs";
@@ -23,7 +24,8 @@ app.use(
 const routes = app
   .route("/conversation", conversation)
   .route("/image", image)
-  .route("/stripe", stripe);
+  .route("/stripe", stripe)
+  .route("/subscription", subscription);
 
 export const GET = handle(app);
 export const POST = handle(app);

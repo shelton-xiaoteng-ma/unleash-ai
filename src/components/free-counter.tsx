@@ -1,18 +1,18 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { MAX_FREE_COUNTS } from "@/constants";
-import { useProModal } from "@/features/saas/store/use-pro-modal";
-import { Zap } from "lucide-react";
+import { useGetSubscription } from "@/features/subscription/hooks/use-get-subscription";
+import { useProModal } from "@/features/subscription/store/use-pro-modal";
+import { Loader, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
 
-interface FreeCounterProps {
-  apiLimitCount: number;
-}
-
-export const FreeCounter = ({ apiLimitCount = 0 }: FreeCounterProps) => {
+export const FreeCounter = () => {
   const [mounted, setMounted] = useState(false);
   const { open } = useProModal();
+  const { data, isPending } = useGetSubscription();
+  const apiLimitCount = data?.apiLimitCount || 0;
+  const isPro = !!data?.isPro;
 
   useEffect(() => {
     setMounted(true);
@@ -21,6 +21,19 @@ export const FreeCounter = ({ apiLimitCount = 0 }: FreeCounterProps) => {
   if (!mounted) {
     return null;
   }
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center h-16">
+        <Loader className="w-6 h-6 animate-spin" />
+      </div>
+    );
+  }
+
+  if (isPro) {
+    return null;
+  }
+
   return (
     <div className="px-3">
       <Card className="bg-white/10 border-0">

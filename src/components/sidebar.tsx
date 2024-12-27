@@ -56,7 +56,7 @@ const routes = [
     icon: Settings,
     href: "/settings",
     color: "text-black",
-    disable: true,
+    disable: false,
   },
   // {
   //   label: "Music Generation",
@@ -66,11 +66,7 @@ const routes = [
   // },
 ];
 
-interface SidebarProps {
-  apiLimitCount: number;
-}
-
-export const Sidebar = ({ apiLimitCount }: SidebarProps) => {
+export const Sidebar = () => {
   const pathname = usePathname();
 
   const disableLink = (e: React.MouseEvent, disabled: boolean) => {
@@ -123,7 +119,7 @@ export const Sidebar = ({ apiLimitCount }: SidebarProps) => {
           ))}
         </div>
       </div>
-      <FreeCounter apiLimitCount={apiLimitCount} />
+      <FreeCounter />
     </div>
   );
 };

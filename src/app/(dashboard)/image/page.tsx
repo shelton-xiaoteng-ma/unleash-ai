@@ -28,7 +28,7 @@ import {
   useImageCreatePrediction,
 } from "@/features/image/api/use-image-create-prediction";
 import { useImageGetPrediction } from "@/features/image/api/use-image-get-prediction";
-import { useProModal } from "@/features/saas/store/use-pro-modal";
+import { useProModal } from "@/features/subscription/store/use-pro-modal";
 import { APIError } from "@/lib/errors";
 import { replicatePendingStatus } from "@/lib/replicate";
 import { useRouter } from "next/navigation";

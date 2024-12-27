@@ -8,7 +8,7 @@ import {
   ResponseType as sendMessageResponseType,
   useSendMessage,
 } from "@/features/conversation/api/use-send-message";
-import { useProModal } from "@/features/saas/store/use-pro-modal";
+import { useProModal } from "@/features/subscription/store/use-pro-modal";
 import { APIError } from "@/lib/errors";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader, MessageSquare } from "lucide-react";
