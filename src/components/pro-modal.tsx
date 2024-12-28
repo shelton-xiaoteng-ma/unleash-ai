@@ -11,8 +11,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useProModal } from "@/features/subscription/store/use-pro-modal";
 import { useCreateCheckoutSession } from "@/features/stripe/api/use-create-checkout-session";
+import { useIssueModal } from "@/features/subscription/store/use-issue-modal";
+import { useProModal } from "@/features/subscription/store/use-pro-modal";
 import { cn } from "@/lib/utils";
 import { Check, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -20,23 +21,33 @@ import { toast } from "sonner";
 
 export const ProModal = () => {
   const { isOpen, close } = useProModal();
+  const { open: openIssueModal } = useIssueModal();
 
   const router = useRouter();
 
   const { mutate: createCheckoutSession, isPending } =
     useCreateCheckoutSession();
 
+  const isStripeEnabled = process.env.STRIPE_ENABLED === "true";
+
+  // Function to handle the subscription process
+  // If Stripe is enabled, it creates a checkout session
+  // Otherwise, it opens an issue modal
   const onSubscribe = () => {
-    createCheckoutSession(undefined, {
-      onSuccess: (data) => {
-        if (data.url) {
-          router.push(data.url);
-        }
-      },
-      onError: () => {
-        toast.error("Failed to create checkout session");
-      },
-    });
+    if (!isStripeEnabled) {
+      openIssueModal();
+    } else {
+      createCheckoutSession(undefined, {
+        onSuccess: (data) => {
+          if (data.url) {
+            router.push(data.url);
+          }
+        },
+        onError: () => {
+          toast.error("Failed to create checkout session");
+        },
+      });
+    }
   };
 
   return (
